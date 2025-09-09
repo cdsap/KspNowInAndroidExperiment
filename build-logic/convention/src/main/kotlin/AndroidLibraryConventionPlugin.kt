@@ -16,6 +16,7 @@
 
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.google.samples.apps.nowinandroid.AwesomeTask
 import com.google.samples.apps.nowinandroid.configureFlavors
 import com.google.samples.apps.nowinandroid.configureGradleManagedDevices
 import com.google.samples.apps.nowinandroid.configureKotlinAndroid
@@ -27,6 +28,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.register
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -34,7 +36,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             apply(plugin = "com.android.library")
             apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "nowinandroid.android.lint")
-
+            tasks.register<AwesomeTask>("awesomeTask")
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 testOptions.targetSdk = 35
