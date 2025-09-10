@@ -6,81 +6,59 @@ FILE="build-logic/convention/src/main/kotlin/com/logic/AuxClass.kt"
 CLASS_NAME="AuxClass"
 ITERATIONS=20   # change if you want more/less cycles
 
+
 # === Helpers ===
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 check_file() {
   [[ -f "$FILE" ]] || die "File not found: $FILE"
-  grep -q "class $CLASS_NAME" "$FILE" || die "Class '$CLASS_NAME' not found in $FILE"
+  grep -q "class[[:space:]]\+$CLASS_NAME\b" "$FILE" || die "Class '$CLASS_NAME' not found in $FILE"
+ # grep -q "fun[[:space:]]\+doSomeWork[[:space:]]*\([[:space:]]*\)[[:space:]]*{" "$FILE" || die "doSomeWork() not found in $FILE"
 }
 
-find_class_closing_brace_line() {
-  # Finds the last line that is just a closing brace '}' (possibly with whitespace).
-  # We rely on the class closing brace being the final '}' in the file.
-  awk '
-    /^[[:space:]]*}[[:space:]]*$/ { last = NR }
-    END { if (last) print last; else print 0 }
-  ' "$FILE"
-}
-
-add_private_function() {
+update_do_some_work() {
   local i="$1"
   local ts
   ts="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
-  # Derive a valid Kotlin identifier (no dashes, etc.)
-  local func_name="bump_${i}"
-
-  # Locate the closing brace line of the class (assumed last brace in file)
-  local close_line
-  close_line="$(find_class_closing_brace_line)"
-  [[ "$close_line" -gt 0 ]] || die "Could not find class closing brace in $FILE"
-
-  # Create the new function block (private + unused, non-ABI/public)
-  # Note: Indented with 4 spaces to fit typical Kotlin style.
-  read -r -d '' FUNC <<EOF || true
-    @Suppress("unused")
-    private fun $func_name(): Int {
-        // auto-generated non-ABI function for iteration $i at $ts
-        return $i
-    }
-
-EOF
-
-  # Insert the function just before the class closing brace.
-  # Keep a backup, then rewrite atomically.
+  # Insert a println before the marker comment
+  # Keeps indentation, appends a short comment so each iteration is unique
   local tmpfile
   tmpfile="$(mktemp)"
-  {
-    head -n $((close_line-1)) "$FILE"
-    printf "%s" "$FUNC"
-    printf "%s\n" ""
-    tail -n +"$close_line" "$FILE"
-  } > "$tmpfile"
+
+  awk -v iter="$i" -v ts="$ts" '
+    BEGIN { inserted=0 }
+    {
+      if (!inserted && $0 ~ /\/\/[[:space:]]*add content here/) {
+        print "        println(" iter ")  // iter " iter " at " ts
+        inserted=1
+      }
+      print
+    }
+  ' "$FILE" > "$tmpfile"
 
   mv "$tmpfile" "$FILE"
-  echo "Inserted private function '$func_name' into $FILE"
+  echo "Inserted println($i) before marker in $FILE"
 }
+
 
 run_build() {
   local tag="$1"
   echo ">>> $(date -u +%FT%TZ) Running assembleDebug"
-  ./gradlew  help -Dscan.tag.$tag --info
+  ./gradlew :help -Dscan.tag.$tag
 }
 
 # === Main ===
 check_file
 run_build seed
 run_build seed2
+
 for ((i=1; i<=ITERATIONS; i++)); do
   echo "===== CYCLE $i ====="
-  echo ">>> Performing change: add new private function inside $CLASS_NAME"
-  add_private_function "$i"
-  run_build gradle_9_build_aux_class
-
+  update_do_some_work "$i"
+  run_build incremental_change_9_nowinandroid
 done
 
 echo "===== FINAL BUILD ====="
-#run_build
 echo "Done."
