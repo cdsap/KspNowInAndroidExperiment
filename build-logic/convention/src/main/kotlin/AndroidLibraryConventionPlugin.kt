@@ -23,6 +23,7 @@ import com.google.samples.apps.nowinandroid.configureKotlinAndroid
 import com.google.samples.apps.nowinandroid.configurePrintApksTask
 import com.google.samples.apps.nowinandroid.disableUnnecessaryAndroidTests
 import com.google.samples.apps.nowinandroid.libs
+import com.logic.AuxClass
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -37,6 +38,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "nowinandroid.android.lint")
             tasks.register<AwesomeTask>("awesomeTask")
+            val auxClass = AuxClass()
+            auxClass.alo()
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 testOptions.targetSdk = 35
