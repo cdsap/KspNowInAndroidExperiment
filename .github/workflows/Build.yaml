@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - abi_gradle_8_14_3
+      - abi_gradle_9
   pull_request:
 
 concurrency:
