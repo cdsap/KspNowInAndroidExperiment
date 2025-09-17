@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `kotlin-dsl`
+    kotlin("jvm") version "2.2.0"
     alias(libs.plugins.android.lint)
 }
 
