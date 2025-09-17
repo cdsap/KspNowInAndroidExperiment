@@ -77,7 +77,8 @@ for ((i=1; i<=ITERATIONS; i++)); do
   echo "===== CYCLE $i ====="
   echo ">>> Performing change: add new private function inside $CLASS_NAME"
   add_private_function "$i"
-  run_build abi_gradle_9
+  cat $FILE
+  run_build abi_gradle_8_14_3_2
 
 done
 
