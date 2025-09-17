@@ -40,9 +40,9 @@ add_private_function() {
   # Create the new function block (private + unused, non-ABI/public)
   # Note: Indented with 4 spaces to fit typical Kotlin style.
   read -r -d '' FUNC <<EOF || true
-    @Suppress("unused")
+
     private fun $func_name(): Int {
-        // auto-generated non-ABI function for iteration $i at $ts
+
         return $i
     }
 
@@ -79,7 +79,7 @@ for ((i=1; i<=ITERATIONS; i++)); do
   add_private_function "$i"
   echo "adding the function"
   cat $FILE
-  run_build abi_gradle_8_14_3_2_c
+  run_build abi_gradle_8_14_3_2_d
 
 done
 
