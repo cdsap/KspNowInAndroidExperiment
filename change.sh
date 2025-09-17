@@ -77,7 +77,7 @@ for ((i=1; i<=ITERATIONS; i++)); do
   add_private_function "$i"
   echo "adding the function"
   cat $FILE
-  run_build abi_gradle_9_2_d
+  run_build abi_gradle_9_2_e
 
 done
 
