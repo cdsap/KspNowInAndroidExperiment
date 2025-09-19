@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # === Config ===
+TAG_NAME=$1
 FILE="build-logic/convention/src/main/kotlin/com/logic/AuxClass.kt"
 CLASS_NAME="AuxClass"
 ITERATIONS=5   # change if you want more/less cycles
@@ -71,15 +72,15 @@ run_build() {
 
 # === Main ===
 check_file
-run_build seed
-run_build seed2
+run_build seed_$TAG_NAME
+run_build seed_incremental_$TAG_NAME
 for ((i=1; i<=ITERATIONS; i++)); do
   echo "===== CYCLE $i ====="
   echo ">>> Performing change: add new private function inside $CLASS_NAME"
   add_private_function "$i"
   echo "adding the function"
   cat $FILE
-  run_build abi_gradle_8_14_3_2_e
+  run_build $TAG_NAME
 
 done
 
