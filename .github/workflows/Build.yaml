@@ -34,7 +34,7 @@ jobs:
           java-version: 21
 
       - name: Check build-logic
-        run: bash change.sh
+        run: bash change.sh abi_gradle_9_2_kio
         env:
            DEVELOCITY_ACCESS_KEY: ${{ secrets.DV_ACCESS_KEY }}
 
